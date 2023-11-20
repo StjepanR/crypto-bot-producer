@@ -6,8 +6,8 @@ pipeline {
 
         DOCKERHUB_CREDENTIALS = credentials("docker-hub-credentials")
 
-        VERSION_FILE = "../../VERSION"
         DOCKER_IMAGE_NAME = "crypto-bot"
+        VERSION_FILE = "../../VERSION"
         LAST_VERSION = sh(
             script: "cat ../../VERSION",
             returnStdout: true
