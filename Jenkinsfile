@@ -18,7 +18,7 @@ pipeline {
     stages {
         stage("Build") {
             steps {
-                echo "Building phase"
+                echo "Building phase..."
 
                 sh "docker build -t $DOCKERHUB_CREDENTIALS_USR/${DOCKER_IMAGE_NAME}:${NEW_VERSION} ."
                 sh "docker build -t $DOCKERHUB_CREDENTIALS_USR/${DOCKER_IMAGE_NAME}:latest ."
@@ -32,7 +32,7 @@ pipeline {
                 }
             }
             steps {
-                echo "Test phase"
+                echo "Test phase..."
                 
                 sh "pip install flask"
                 sh "pytest --junit-xml=./test-reports/results.xml -v ./test/"
@@ -41,7 +41,7 @@ pipeline {
 
         stage("Deliver") {
             steps {
-                echo "Delivery phase"
+                echo "Delivery phase..."
 
                 echo "Logging in the docker hub with username $DOCKERHUB_CREDENTIALS_USR"
                 sh "echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin"
