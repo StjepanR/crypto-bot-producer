@@ -55,7 +55,7 @@ pipeline {
             post {
                 success {
                     script {
-                        echo "Writting new version ${NEW_VERSION} to file ${VERSION_FILE}"
+                        echo "Writing new version ${NEW_VERSION} to file ${VERSION_FILE}"
                         writeFile(file: "${VERSION_FILE}", text: "${NEW_VERSION}")
                     }
                 }
