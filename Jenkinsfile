@@ -28,7 +28,7 @@ pipeline {
         stage("Test") {
             agent {
                 docker {
-                    image "qnib/pytest"
+                    image "python:3.9.18-slim-bullseye"
                 }
             }
             steps {
