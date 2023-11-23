@@ -34,7 +34,7 @@ pipeline {
             steps {
                 echo "Test phase..."
                 
-                sh "pip install flask"
+                sh "pip install -r requirements.txt"
                 sh "pytest --junit-xml=./test-reports/results.xml -v ./test/"
             }
         }
