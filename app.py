@@ -18,4 +18,4 @@ if __name__=="__main__":
     config = Config().get_config()
 
     app = create_app()
-    app.run(host=config["host"], port=config["port"], debug=True)
+    app.run(host=config["host"], port=config["port"])
