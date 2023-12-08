@@ -1,21 +1,21 @@
-from flask import Flask
-from prometheus_flask_exporter import PrometheusMetrics
-from config import Config
+import uvicorn
 
-def create_app():
-    app = Flask(__name__)
+from config.config import Config
+from fastapi import FastAPI
+from prometheus_fastapi_instrumentator import Instrumentator
 
-    metrics = PrometheusMetrics(app)
-    metrics.info("app_info", "Crypto Bot application for trading with crypto currencies", version="1.0.0")
+app = FastAPI()
 
-    @app.route("/")
-    def hello_world():
-        return "Hello, Docker!"
-
+def get_app():
     return app
+
+@app.get("/")
+async def root():
+    return {"message": "Hello World"}
+
+Instrumentator().instrument(app).expose(app)
 
 if __name__=="__main__":
     config = Config().get_config()
 
-    app = create_app()
-    app.run(host=config["host"], port=config["port"])
+    uvicorn.run(app, host=config["host"], port=config["port"])
