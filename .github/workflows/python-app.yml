@@ -49,11 +49,12 @@ jobs:
         with:
           context: .
           push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ secrets.MAJOR }}.${{ secrets.MINOR }}.${{ secrets.PATCH }}
+          tags: ${{ secrets.MAJOR }}.${{ secrets.MINOR }}.${{ secrets.PATCH }}
+          labels: ${{ steps.meta.outputs.labels }}
       - name: Update patch version
         uses: hmanzur/actions-set-secret@v2.0.0
         with:
           name: 'PATCH'
           value: $((${{ secrets.PATCH }}+1))
           repository: ${{ env.GITHUB_USERNAME }}/${{ env.REPOSITORY_NAME }}
+          token: ${{ secrets.VERSION_UPGRADE_ACCESS_TOKEN }}
