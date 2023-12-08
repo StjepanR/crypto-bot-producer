@@ -9,9 +9,12 @@ on:
 env:
   REGISTRY: docker.io/stjepanr
   IMAGE_NAME: crypto-bot
+  REPOSITORY_NAME: crypto-bot
+  GITHUB_USERNAME: StjepanR
 
 jobs:
   test:
+    name: Test with Pytest
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -20,7 +23,7 @@ jobs:
           pip install -r requirements.txt
           pytest -v ./test/
   push_to_registry:
-    name: Push Docker image to Docker Hub
+    name: Build and Push Docker Image to Docker Hub
     runs-on: ubuntu-latest
     steps:
       - name: Check out the repo
@@ -47,4 +50,10 @@ jobs:
           context: .
           push: true
           tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+          labels: ${{ secrets.MAJOR }}.${{ secrets.MINOR }}.${{ secrets.PATCH }}
+      - name: Update patch version
+        uses: hmanzur/actions-set-secret@v2.0.0
+        with:
+          name: 'PATCH'
+          value: $((${{ secrets.PATCH }}+1))
+          repository: ${{ env.GITHUB_USERNAME }}/${{ env.REPOSITORY_NAME }}
