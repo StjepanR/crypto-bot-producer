@@ -41,6 +41,7 @@ jobs:
       - name: Update Secret
         uses: gliech/create-github-secret-action@v1
         with:
+          location: ${{ env.REPOSITORY_OWNER }}/${{ env.REPOSITORY_NAME }}
           name: ${{ env.SECRET_NAME }}
           value:  ${{ env.NEW_SECRET_VALUE }}
           pa_token: ${{ secrets.VERSION_UPGRADE_ACCESS_TOKEN }}
