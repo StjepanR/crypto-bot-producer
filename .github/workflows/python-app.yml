@@ -10,7 +10,7 @@ env:
   REGISTRY: docker.io/stjepanr
   IMAGE_NAME: crypto-bot
   REPOSITORY_NAME: crypto-bot
-  GITHUB_USERNAME: StjepanR
+  REPOSITORY_OWNER: StjepanR
 
 jobs:
   test:
@@ -22,6 +22,30 @@ jobs:
         run: |
           pip install -r requirements.txt
           pytest -v ./test/
+
+  update_patch_version:
+    name: Update Patch Version
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set env
+        env:
+          NEW_SECRET_VALUE: ${{ secrets.PATCH }}
+        run: |
+          NEW_SECRET_VALUE = $(( NEW_SECRET_VALUE + 1 ))
+          echo $NEW_SECRET_VALUE
+
+      - name: Update Secret
+        uses: punitkashyup/update-secret-action@v1
+        with:
+          repository_owner: ${{ env.REPOSITORY_OWNER }}
+          repository_name: ${{ env.REPOSITORY_NAME }}
+          secret_name: ${{ env.SECRET_NAME }}
+          new_secret_value: ${{ env.NEW_SECRET_VALUE }}
+          github_token: ${{ secrets.VERSION_UPGRADE_ACCESS_TOKEN }}
+
   push_to_registry:
     name: Build and Push Docker Image to Docker Hub
     runs-on: ubuntu-latest
@@ -50,11 +74,3 @@ jobs:
           context: .
           push: true
           tags: ${{ secrets.MAJOR }}.${{ secrets.MINOR }}.${{ secrets.PATCH }}
-          labels: ${{ steps.meta.outputs.labels }}
-      - name: Update patch version
-        uses: hmanzur/actions-set-secret@v2.0.0
-        with:
-          name: 'PATCH'
-          value: $((${{ secrets.PATCH }}+1))
-          repository: ${{ env.GITHUB_USERNAME }}/${{ env.REPOSITORY_NAME }}
-          token: ${{ secrets.VERSION_UPGRADE_ACCESS_TOKEN }}
