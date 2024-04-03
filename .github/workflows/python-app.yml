@@ -11,7 +11,6 @@ env:
   IMAGE_NAME: crypto-bot
   REPOSITORY_NAME: crypto-bot
   REPOSITORY_OWNER: StjepanR
-  SECRET_NAME: PATCH
 
 jobs:
   test:
@@ -35,6 +34,7 @@ jobs:
         env:
           NEW_SECRET_VALUE: ${{ secrets.PATCH }}
         run: |
+          echo  $NEW_SECRET_VALUE
           NEW_SECRET_VALUE = $(( NEW_SECRET_VALUE + 1 ))
           echo $NEW_SECRET_VALUE
 
@@ -42,7 +42,7 @@ jobs:
         uses: gliech/create-github-secret-action@v1
         with:
           location: ${{ env.REPOSITORY_OWNER }}/${{ env.REPOSITORY_NAME }}
-          name: ${{ env.SECRET_NAME }}
+          name: PATCH
           value:  ${{ env.NEW_SECRET_VALUE }}
           pa_token: ${{ secrets.VERSION_UPGRADE_ACCESS_TOKEN }}
 
