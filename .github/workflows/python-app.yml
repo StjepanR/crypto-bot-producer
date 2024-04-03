@@ -72,4 +72,4 @@ jobs:
         with:
           context: .
           push: true
-          tags: ${{ secrets.MAJOR }}.${{ secrets.MINOR }}.${{ secrets.PATCH }}
+          tags: ${{ env.REPOSITORY_OWNER }}/${{ env.IMAGE_NAME }}:${{ secrets.MAJOR }}.${{ secrets.MINOR }}.${{ secrets.PATCH }}
