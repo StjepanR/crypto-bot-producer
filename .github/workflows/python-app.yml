@@ -35,7 +35,7 @@ jobs:
           NEW_SECRET_VALUE: ${{ secrets.PATCH }}
         run: |
           echo  $NEW_SECRET_VALUE
-          NEW_SECRET_VALUE = $(( NEW_SECRET_VALUE + 1 ))
+          NEW_SECRET_VALUE=$(( NEW_SECRET_VALUE + 1 ))
           echo $NEW_SECRET_VALUE
 
       - name: Update Secret
