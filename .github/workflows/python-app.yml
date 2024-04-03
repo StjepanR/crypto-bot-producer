@@ -39,13 +39,11 @@ jobs:
           echo $NEW_SECRET_VALUE
 
       - name: Update Secret
-        uses: ekowcharles/update-github-actions-secret@v1
-        env:
-          OWNER: ${{ env.REPOSITORY_OWNER }}
-          REPOSITORY: ${{ env.REPOSITORY_NAME }}
-          SECRET_NAME: ${{ env.SECRET_NAME }}
-          SECRET_VALUE: ${{ env.NEW_SECRET_VALUE }}
-          ACCESS_TOKEN: ${{ secrets.VERSION_UPGRADE_ACCESS_TOKEN }}
+        uses: gliech/create-github-secret-action@v1
+        with:
+          name: ${{ env.SECRET_NAME }}
+          value:  ${{ env.NEW_SECRET_VALUE }}
+          pa_token: ${{ secrets.VERSION_UPGRADE_ACCESS_TOKEN }}
 
   push_to_registry:
     name: Build and Push Docker Image to Docker Hub
