@@ -11,6 +11,7 @@ env:
   IMAGE_NAME: crypto-bot
   REPOSITORY_NAME: crypto-bot
   REPOSITORY_OWNER: StjepanR
+  SECRET_NAME: PATCH
 
 jobs:
   test:
@@ -38,13 +39,13 @@ jobs:
           echo $NEW_SECRET_VALUE
 
       - name: Update Secret
-        uses: punitkashyup/update-secret-action@v1
-        with:
-          repository_owner: ${{ env.REPOSITORY_OWNER }}
-          repository_name: ${{ env.REPOSITORY_NAME }}
-          secret_name: ${{ env.SECRET_NAME }}
-          new_secret_value: ${{ env.NEW_SECRET_VALUE }}
-          github_token: ${{ secrets.VERSION_UPGRADE_ACCESS_TOKEN }}
+        uses: ekowcharles/update-github-actions-secret@v1
+        env:
+          OWNER: ${{ env.REPOSITORY_OWNER }}
+          REPOSITORY: ${{ env.REPOSITORY_NAME }}
+          SECRET_NAME: ${{ env.SECRET_NAME }}
+          SECRET_VALUE: ${{ env.NEW_SECRET_VALUE }}
+          ACCESS_TOKEN: ${{ secrets.VERSION_UPGRADE_ACCESS_TOKEN }}
 
   push_to_registry:
     name: Build and Push Docker Image to Docker Hub
