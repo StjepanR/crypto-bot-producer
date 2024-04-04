@@ -71,7 +71,7 @@ jobs:
         with:
           context: .
           push: true
-          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ secrets.MAJOR }}.${{ secrets.MINOR }}.${{ secrets.PATCH }}
+          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ secrets.MAJOR }}.${{ secrets.MINOR }}.${{ secrets.PATCH }},${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
           secrets: |
             "COINBASE_API_KEY=${{ secrets.COINBASE_API_KEY }}"
             "COINBASE_API_SECRET=${{ secrets.COINBASE_API_SECRET }}"
