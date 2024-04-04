@@ -34,7 +34,7 @@ jobs:
         env:
           NEW_SECRET_VALUE: ${{ secrets.PATCH }}
         run: |
-          echo ::set-env name=NEW_SECRET_VALUE::$((NEW_SECRET_VALUE+1))
+          echo "NEW_SECRET_VALUE=$(($NEW_SECRET_VALUE + 1))" >> $GITHUB_ENV
 
       - name: Update Secret
         uses: gliech/create-github-secret-action@v1
