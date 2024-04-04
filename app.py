@@ -1,4 +1,5 @@
 import uvicorn
+from service.coinbaseSocket import CoinbaseSocket
 
 from config.config import Config
 from fastapi import FastAPI
@@ -16,6 +17,9 @@ async def root():
 Instrumentator().instrument(app).expose(app)
 
 if __name__=="__main__":
-    config = Config().get_config()
+    config = Config()
 
-    uvicorn.run(app, host=config["host"], port=config["port"])
+    uvicorn.run(app, host=config.host, port=config.port)
+    socket = CoinbaseSocket(config.coinbase_api_key, config.coinbase_api_secret)
+    socket.subscribe(["BTC-USD"])
+    socket.ws_client.open()
