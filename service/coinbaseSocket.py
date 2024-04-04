@@ -1,6 +1,6 @@
-from coinbase.websocket import WSClient
 import json
-import math
+
+from coinbase.websocket import WSClient
 
 class CoinbaseSocket:
 

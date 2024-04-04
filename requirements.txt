@@ -1,6 +1,6 @@
 pytest==7.4.3
 PyYAML==6.0.1
-coinbase>=2.0.0
+coinbase-advanced-py>=1.2.0
 httpx
 uvicorn
 fastapi
