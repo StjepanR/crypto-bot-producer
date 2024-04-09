@@ -8,8 +8,8 @@ on:
 
 env:
   REGISTRY: docker.io/stjepanruklic
-  IMAGE_NAME: crypto-bot
-  REPOSITORY_NAME: crypto-bot
+  IMAGE_NAME: crypto-bot-producer
+  REPOSITORY_NAME: crypto-bot-producer
   REPOSITORY_OWNER: StjepanR
 
 jobs:
@@ -58,7 +58,7 @@ jobs:
         uses: docker/login-action@f054a8b539a109f9f41c372932f1ae047eff08c9
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
+          password: ${{ secrets.DOCKER_TOKEN}}
 
       - name: Extract metadata (tags, labels) for Docker
         id: meta
