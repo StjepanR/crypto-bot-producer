@@ -10,10 +10,10 @@ class CoinbaseSocket:
         print(api_secret)
         self.ws_client = WSClient(api_key=api_key, api_secret=api_secret, on_message=self.on_message, verbose=verbose)
 
-    def start(self):
+    def start(self, channel):
         try:
             self.ws_client.open()
-            self.subscribe("BTC-USD")
+            self.subscribe(channel)
             self.ws_client.run_forever_with_exception_check()
         except WSClientConnectionClosedException as e:
             logging.error("Connection closed! Retry attempts exhausted.", e)
@@ -22,8 +22,7 @@ class CoinbaseSocket:
 
     def subscribe(self, channel):
         try:
-
-            self.ws_client.subscribe(product_ids=list(channel), channels=["level2"])
+            self.ws_client.subscribe(product_ids=[channel], channels=["level2"])
         except:
             logging.info("failed to subscribe to channel: " + channel)
             raise RuntimeError("failed to subscribe to channel: " + channel)

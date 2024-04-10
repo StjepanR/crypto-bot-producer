@@ -7,7 +7,6 @@ class Config:
             config = yaml.safe_load(f)
         self.host = config["host"]
         self.port = config["port"]
-        self.feed = config["feed"]
         self.kafka_broker_url = config["kafka-broker-url"]
         self.coinbase_api_key = os.environ.get("COINBASE_API_KEY")
         self.coinbase_api_secret = os.environ.get("COINBASE_API_SECRET")
