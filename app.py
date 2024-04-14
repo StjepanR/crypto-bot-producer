@@ -1,8 +1,8 @@
 import collections
-import threading
 import logging
 
 from service.coinbaseSocket import CoinbaseSocket
+from service.kubernatesService import KubernetesService
 from config.config import Config
 from fastapi import FastAPI
 from prometheus_fastapi_instrumentator import Instrumentator
@@ -12,7 +12,13 @@ config = Config()
 app = FastAPI()
 Instrumentator().instrument(app).expose(app)
 
-threads = collections.defaultdict(threading.Thread)
+kubernetesService = KubernetesService()
+
+deployments = collections.defaultdict(str)
+
+IMAGE = "stjepanruklic/crypto-bot-worker"
+VERSION = "latest"
+PORT = 5001
 
 
 def get_app():
@@ -31,30 +37,26 @@ async def root():
 
 @app.get("/stream/list")
 async def list():
-    return threads.keys() if threads.keys() else []
+    return deployments.keys() if deployments.keys() else []
 
 
 @app.get("/stream/subscribe/{channel}")
 async def subscribe(channel):
-    try:
-        logging.info("subscribing to channel " + channel)
-        thread = threading.Thread(target=producer, args=(channel,))
-        threads[channel] = thread
-        thread.start()
+    logging.info("subscribing to channel " + channel)
 
-        return {"message": "subscribed to channel: " + channel}
-    except:
-        logging.log("failed to subscribed to channel: " + channel)
-        raise RuntimeError("failed to subscribed to channel: " + channel)
+    deployment_name = channel + "-worker"
+    deployment = kubernetesService.create_deployment_object(channel, IMAGE + ":" + VERSION, deployment_name)
+    kubernetesService.create_deployment(channel + "-worker")
+
+    deployments[deployment_name] = deployment
+
+    return {"message": "subscribed to channel: " + channel}
 
 
 @app.delete("/stream/unsubscribe/{channel}")
 async def unsubscribe(channel):
-    try:
-        logging.info("unsubscribing from channel: " + channel)
-        threads.get(channel).join()
+    logging.info("unsubscribing from channel: " + channel)
 
-        return {"message": "unsubscribed from channel: " + channel}
-    except:
-        logging.error("failed to unsubscribe from channel: " + channel)
-        raise RuntimeError("failed to unsubscribe from channel: " + channel)
+    kubernetesService.delete_deployment(channel + "-worker")
+
+    return {"message": "unsubscribed from channel: " + channel}
