@@ -6,4 +6,4 @@ uvicorn
 fastapi
 prometheus_fastapi_instrumentator
 kafka-python>=2.0.2
-kubernates
+kubernetes
