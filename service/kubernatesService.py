@@ -8,7 +8,7 @@ from kubernetes import client, config
 class KubernetesService:
 
     def __init__(self):
-        config.load_kube_config()
+        config.load_incluster_config()
         self.api = client.AppsV1Api()
         self.namespace = "default"
 
