@@ -46,7 +46,7 @@ async def subscribe(channel):
 
     deployment_name = channel + "-worker"
     deployment = kubernetesService.create_deployment_object(channel, IMAGE + ":" + VERSION, deployment_name)
-    kubernetesService.create_deployment(channel + "-worker")
+    kubernetesService.create_deployment(deployment, channel + "-worker")
 
     deployments[deployment_name] = deployment
 
