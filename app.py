@@ -45,7 +45,7 @@ async def subscribe(channel):
     logging.info("subscribing to channel " + channel)
 
     deployment_name = channel + "-worker"
-    deployment = kubernetesService.create_deployment_object(channel, IMAGE + ":" + VERSION, deployment_name)
+    deployment = kubernetesService.create_deployment_object(channel, IMAGE + ":" + VERSION, 5001, deployment_name)
     kubernetesService.create_deployment(deployment, channel + "-worker")
 
     deployments[deployment_name] = deployment
