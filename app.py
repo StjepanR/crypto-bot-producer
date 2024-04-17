@@ -47,8 +47,8 @@ async def subscribe(channel):
     deployment_name = channel.lower() + "-worker"
 
     if deployment_name not in deployments.keys():
-        deployment = kubernetesService.create_deployment_object(channel, IMAGE + ":" + VERSION, 5001, deployment_name)
-        kubernetesService.create_deployment(deployment, channel + "-worker")
+        deployment = kubernetesService.create_deployment_object(channel.lower(), IMAGE + ":" + VERSION, 5001, deployment_name)
+        kubernetesService.create_deployment(deployment, deployment_name)
 
         deployments[deployment_name] = deployment
     else:
