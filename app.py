@@ -25,9 +25,8 @@ def get_app():
     return app
 
 
-async def producer(channel):
-    socket = CoinbaseSocket(api_key=config.coinbase_api_key, api_secret=config.coinbase_api_secret, channel=channel)
-    socket.start()
+socket = CoinbaseSocket(api_key=config.coinbase_api_key, api_secret=config.coinbase_api_secret)
+socket.start()
 
 
 @app.get("/")
@@ -50,6 +49,8 @@ async def subscribe(channel):
         deployment = kubernetesService.create_deployment_object(channel.lower(), IMAGE + ":" + VERSION, 5001, deployment_name)
         kubernetesService.create_deployment(deployment, deployment_name)
 
+        socket.subscribe(channel=channel)
+
         deployments[deployment_name] = deployment
     else:
         return {"message": "already subscribed to channel: " + channel}
@@ -62,6 +63,8 @@ async def unsubscribe(channel):
     logging.info("unsubscribing from channel: " + channel)
 
     deployment_name = channel.lower() + "-worker"
+
+    socket.unsubscribe(channel=channel)
 
     if deployment_name in deployments.keys():
         kubernetesService.delete_deployment(deployment_name)

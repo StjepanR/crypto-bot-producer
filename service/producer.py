@@ -5,14 +5,13 @@ from config.config import Config
 
 
 class Producer:
-    def __init__(self, topic):
+    def __init__(self):
         config = Config()
         self.producer = KafkaProducer(bootstrap_servers=[config.kafka_broker_url])
-        self.topic = topic
 
-    def produce(self, message):
+    def produce(self, topic, message):
         (self.producer
-         .send(self.topic, message)
+         .send(topic, message)
          .add_callback(self.on_send_success)
          .add_errback(self.on_send_error))
 

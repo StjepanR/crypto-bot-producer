@@ -7,10 +7,9 @@ from service.producer import Producer
 
 class CoinbaseSocket:
 
-    def __init__(self, api_key, api_secret, channel, verbose=True):
+    def __init__(self, api_key, api_secret, verbose=True):
         self.ws_client = WSClient(api_key=api_key, api_secret=api_secret, on_message=self.on_message, verbose=verbose)
-        self.channel = channel
-        self.producer = Producer(channel)
+        self.producer = Producer()
 
     def start(self):
         try:
@@ -39,7 +38,7 @@ class CoinbaseSocket:
     def on_message(self, message):
         try:
             message_data = json.loads(message)
-            self.producer.produce(message_data)
+            self.producer.produce("topic", message_data)
         except:
             logging.info("failed processing message")
             raise RuntimeError("failed processing message")
