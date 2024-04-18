@@ -3,7 +3,7 @@ import logging
 
 import pytz
 from kubernetes import client, config
-
+from config.config import Config
 
 class KubernetesService:
 
@@ -11,11 +11,33 @@ class KubernetesService:
         config.load_incluster_config()
         self.api = client.AppsV1Api()
         self.namespace = "default"
+        self.config = Config()
 
     def create_deployment_object(self, name, image, port, deployment_name):
         # Get metadata
         producer = self.api.list_namespaced_deployment(namespace="default", label_selector="type=producer")
         print(producer)
+
+        # Create environment variables for container
+        coinbase_api_secret_environment_variable = client.V1EnvVar(
+            name="COINBASE_API_SECRET",
+            value=self.config.coinbase_api_secret
+        )
+
+        coinbase_api_key_environment_variable = client.V1EnvVar(
+            name="COINBASE_API_KEY",
+            value=self.config.coinbase_api_key
+        )
+
+        kafka_broker_url_environment_variable = client.V1EnvVar(
+            name="KAFKA_BROKER_URL",
+            value=self.config.kafka_broker_url
+        )
+
+        kafka_topic_environment_variable = client.V1EnvVar(
+            name="KAFKA_TOPIC",
+            value=name
+        )
 
         # Configure Pod template container
         container = client.V1Container(
@@ -26,6 +48,12 @@ class KubernetesService:
                 requests={"cpu": "100m", "memory": "200Mi"},
                 limits={"cpu": "500m", "memory": "500Mi"},
             ),
+            env=[
+                coinbase_api_secret_environment_variable,
+                coinbase_api_key_environment_variable,
+                kafka_broker_url_environment_variable,
+                kafka_topic_environment_variable
+            ]
         )
 
         # Create and configure a spec section
