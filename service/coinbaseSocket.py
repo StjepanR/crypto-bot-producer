@@ -8,7 +8,7 @@ from service.producerService import Producer
 class CoinbaseSocket:
 
     def __init__(self, api_key, api_secret, verbose=True):
-        self.ws_client = WSClient(api_key=api_key, api_secret=api_secret, on_message=self.on_message, verbose=verbose)
+        self.ws_client = WSClient(api_key=api_key, api_secret=api_secret, on_message=on_message, verbose=verbose)
         self.producer = Producer()
 
     def start(self):
@@ -33,19 +33,6 @@ class CoinbaseSocket:
             logging.error("failed to unsubscribe from channel: " + channel, e)
             raise RuntimeError("failed to unsubscribe from channel: " + channel)
 
-    def on_message(self, message):
-        try:
-            logging.debug("got new message: " + message)
-
-            message_data = json.loads(message)
-
-            if "channel" in message_data and message_data["channel"] == "ticker":
-                price_data = get_product_data(message_data)
-                self.producer.produce(price_data["product_id"], price_data)
-
-        except Exception as e:
-            logging.error("failed processing message", e)
-            raise RuntimeError("failed processing message")
 
     def close(self):
         try:
@@ -53,6 +40,21 @@ class CoinbaseSocket:
         except Exception as e:
             logging.error("closing coinbase socket failed", e)
             raise RuntimeError("closing coinbase socket failed")
+
+
+def on_message(self, message):
+    try:
+        logging.debug("got new message: " + message)
+
+        message_data = json.loads(message)
+
+        if "channel" in message_data and message_data["channel"] == "ticker":
+            price_data = get_product_data(message_data)
+            self.producer.produce(price_data["product_id"], price_data)
+
+    except Exception as e:
+        logging.error("failed processing message", e)
+        raise RuntimeError("failed processing message")
 
 
 def get_product_data(message_data):
