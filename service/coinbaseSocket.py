@@ -2,7 +2,7 @@ import json
 import logging
 
 from coinbase.websocket import WSClient, WSClientConnectionClosedException, WSClientException
-from service.producer import Producer
+from service.producerService import Producer
 
 
 class CoinbaseSocket:
@@ -14,8 +14,6 @@ class CoinbaseSocket:
     def start(self):
         try:
             self.ws_client.open()
-            self.subscribe(self.channel)
-            self.ws_client.run_forever_with_exception_check()
         except WSClientConnectionClosedException as e:
             logging.error("Connection closed! Retry attempts exhausted.", e)
         except WSClientException as e:
@@ -23,29 +21,52 @@ class CoinbaseSocket:
 
     def subscribe(self, channel):
         try:
-            self.ws_client.subscribe(product_ids=[channel], channels=["level2"])
-        except:
-            logging.info("failed to subscribe to channel: " + channel)
+            self.ws_client.subscribe(product_ids=[channel], channels=["ticker"])
+        except Exception as e:
+            logging.error("failed to subscribe to channel: " + channel, e)
             raise RuntimeError("failed to subscribe to channel: " + channel)
 
     def unsubscribe(self, channel):
         try:
-            self.ws_client.unsubscribe(list(channel), ["heartbeats", "ticker"])
-        except:
-            logging.info("failed to unsubscribe from channel: " + channel)
+            self.ws_client.unsubscribe(product_ids=[channel], channels=["ticker"])
+        except Exception as e:
+            logging.error("failed to unsubscribe from channel: " + channel, e)
             raise RuntimeError("failed to unsubscribe from channel: " + channel)
 
     def on_message(self, message):
         try:
+            logging.debug("got new message: " + message)
+
             message_data = json.loads(message)
-            self.producer.produce("topic", message_data)
-        except:
-            logging.info("failed processing message")
+
+            if "channel" in message_data and message_data["channel"] == "ticker":
+                price_data = get_product_data(message_data)
+                self.producer.produce(price_data["product_id"], price_data)
+
+        except Exception as e:
+            logging.error("failed processing message", e)
             raise RuntimeError("failed processing message")
 
     def close(self):
         try:
             self.ws_client.close()
-        except:
-            logging.info("closing coinbase socket failed")
+        except Exception as e:
+            logging.error("closing coinbase socket failed", e)
             raise RuntimeError("closing coinbase socket failed")
+
+
+def get_product_data(message_data):
+    if "events" in message_data and len(message_data["events"]) > 0:
+        event = message_data["events"][0]
+        if "tickers" in event and len(event["tickers"]) > 0:
+            ticker = event["tickers"][0]
+            return ticker
+
+
+def get_product_id(message_data):
+    if "events" in message_data and len(message_data["events"]) > 0:
+        event = message_data["events"][0]
+        if "tickers" in event and len(event["tickers"]) > 0:
+            ticker = event["tickers"][0]
+            if "product_id" in ticker:
+                return ticker["product_id"]

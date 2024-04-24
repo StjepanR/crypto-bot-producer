@@ -1,11 +1,10 @@
-import collections
 import logging
 
 from service.coinbaseSocket import CoinbaseSocket
 from service.kubernatesService import KubernetesService
+from prometheus_fastapi_instrumentator import Instrumentator
 from config.config import Config
 from fastapi import FastAPI
-from prometheus_fastapi_instrumentator import Instrumentator
 
 config = Config()
 
@@ -14,16 +13,9 @@ Instrumentator().instrument(app).expose(app)
 
 kubernetesService = KubernetesService()
 
-deployments = collections.defaultdict(str)
-
 IMAGE = "stjepanruklic/crypto-bot-worker"
 VERSION = "latest"
 PORT = 5001
-
-
-def get_app():
-    return app
-
 
 socket = CoinbaseSocket(api_key=config.coinbase_api_key, api_secret=config.coinbase_api_secret)
 socket.start()
@@ -31,27 +23,28 @@ socket.start()
 
 @app.get("/")
 async def root():
-    return {"message": "Hello World"}
+    return {"status": "up"}
 
 
 @app.get("/stream/list")
-async def list():
-    return deployments.keys() if deployments.keys() else []
+async def list_streams():
+    try:
+        logging.info("fetching subscriptions")
+        return socket.ws_client.subscriptions
+    except Exception as e:
+        logging.error("failed to fetch list of subscriptions", e)
 
 
 @app.get("/stream/subscribe/{channel}")
 async def subscribe(channel):
-    logging.info("subscribing to channel " + channel)
+    logging.info("subscribing to channel: " + channel)
 
     deployment_name = channel.lower() + "-worker"
 
-    if deployment_name not in deployments.keys():
-        deployment = kubernetesService.create_deployment_object(channel.lower(), IMAGE + ":" + VERSION, 5001, deployment_name)
+    if deployment_name not in socket.ws_client["level2"]:
+        deployment = kubernetesService.create_deployment_object(channel.lower(), IMAGE + ":" + VERSION, 5001,
+                                                                deployment_name, channel)
         kubernetesService.create_deployment(deployment, deployment_name)
-
-        socket.subscribe(channel=channel)
-
-        deployments[deployment_name] = deployment
     else:
         return {"message": "already subscribed to channel: " + channel}
 
@@ -64,9 +57,7 @@ async def unsubscribe(channel):
 
     deployment_name = channel.lower() + "-worker"
 
-    socket.unsubscribe(channel=channel)
-
-    if deployment_name in deployments.keys():
+    if deployment_name in socket.ws_client["level2"]:
         kubernetesService.delete_deployment(deployment_name)
     else:
         return {"message": "not previously subscribed to channel: " + channel}

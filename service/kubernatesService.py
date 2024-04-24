@@ -1,9 +1,10 @@
 import datetime
 import logging
-
 import pytz
+
 from kubernetes import client, config
 from config.config import Config
+
 
 class KubernetesService:
 
@@ -13,9 +14,10 @@ class KubernetesService:
         self.namespace = "default"
         self.config = Config()
 
-    def create_deployment_object(self, name, image, port, deployment_name):
+    def create_deployment_object(self, name, image, port, deployment_name, topic):
         # Get metadata
         producer = self.api.list_namespaced_deployment(namespace="default", label_selector="type=producer")
+        logging.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>" + producer + "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<")
         print(producer)
 
         # Create environment variables for container
@@ -36,7 +38,7 @@ class KubernetesService:
 
         kafka_topic_environment_variable = client.V1EnvVar(
             name="KAFKA_TOPIC",
-            value=name
+            value=topic
         )
 
         # Configure Pod template container
@@ -92,10 +94,11 @@ class KubernetesService:
 
             logging.info("deployment: " + deployment_name + " created")
             logging.info(
-                "namespace: " + response.metadata.namespace + "\nname: " + response.metadata.name + "\nrevision: " + str(response.metadata.generation) + "\nimage: " +
+                "namespace: " + response.metadata.namespace + "\nname: " + response.metadata.name + "\nrevision: " + str(
+                    response.metadata.generation) + "\nimage: " +
                 response.spec.template.spec.containers[0].image)
-        except:
-            logging.error("failed to create deployment: " + deployment_name)
+        except Exception as e:
+            logging.error("failed to create deployment: " + deployment_name, e)
             raise RuntimeError("failed to create deployment: " + deployment_name)
 
     def update_deployment(self, deployment, deployment_name):
@@ -106,10 +109,11 @@ class KubernetesService:
 
             logging.info("deployment: " + deployment_name + " restarted")
             logging.info(
-                "namespace: " + response.metadata.namespace + "\nname: " + response.metadata.name + "\nrevision: " + str(response.metadata.generation) + "\nimage: " +
+                "namespace: " + response.metadata.namespace + "\nname: " + response.metadata.name + "\nrevision: " + str(
+                    response.metadata.generation) + "\nimage: " +
                 response.spec.template.spec.containers[0].image)
-        except:
-            logging.error("failed to update deployment: " + deployment_name)
+        except Exception as e:
+            logging.error("failed to update deployment: " + deployment_name, e)
             raise RuntimeError("failed to update deployment: " + deployment_name)
 
     def restart_deployment(self, deployment, deployment_name):
@@ -125,10 +129,11 @@ class KubernetesService:
 
             logging.info("deployment: " + deployment_name + " restarted")
             logging.info(
-                "namespace: " + response.metadata.namespace + "\nname: " + response.metadata.name + "\nrevision: " + str(response.metadata.generation) + "\nimage: " +
+                "namespace: " + response.metadata.namespace + "\nname: " + response.metadata.name + "\nrevision: " + str(
+                    response.metadata.generation) + "\nimage: " +
                 response.spec.template.spec.containers[0].image)
-        except:
-            logging.error("failed to restart deployment: " + deployment_name)
+        except Exception as e:
+            logging.error("failed to restart deployment: " + deployment_name, e)
             raise RuntimeError("failed to restart deployment: " + deployment_name)
 
     def delete_deployment(self, deployment_name):
@@ -142,8 +147,9 @@ class KubernetesService:
             )
             logging.info("deployment: " + deployment_name + " deleted")
             logging.info(
-                "namespace: " + response.metadata.namespace + "\nname: " + response.metadata.name + "\nrevision: " + str(response.metadata.generation) + "\nimage: " +
+                "namespace: " + response.metadata.namespace + "\nname: " + response.metadata.name + "\nrevision: " + str(
+                    response.metadata.generation) + "\nimage: " +
                 response.spec.template.spec.containers[0].image)
-        except:
-            logging.error("failed to delete deployment: " + deployment_name)
+        except Exception as e:
+            logging.error("failed to delete deployment: " + deployment_name, e)
             raise RuntimeError("failed to delete deployment: " + deployment_name)

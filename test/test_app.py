@@ -1,7 +1,7 @@
 from fastapi.testclient import TestClient
-from app import get_app
+from app import app
 
-client = TestClient(get_app())
+client = TestClient(app)
 
 def test_should_status_code_ok():
     response = client.get('/')
