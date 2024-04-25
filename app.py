@@ -10,7 +10,7 @@ config = Config()
 
 app = FastAPI()
 Instrumentator().instrument(app).expose(app)
-print(config)
+
 kubernetesService = KubernetesService()
 
 IMAGE = "stjepanruklic/crypto-bot-worker"
