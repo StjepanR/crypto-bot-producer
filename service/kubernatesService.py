@@ -16,9 +16,8 @@ class KubernetesService:
 
     def create_deployment_object(self, name, image, port, deployment_name, topic):
         # Get metadata
-        producer = self.api.list_namespaced_deployment(namespace="default", label_selector="type=producer")
-        logging.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>" + producer + "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<")
-        print(producer)
+        producer = self.api.list_namespaced_deployment(namespace="default", label_selector="type=producer") # V1DeploymentList
+        print(producer._metadata)
 
         # Create environment variables for container
         coinbase_api_secret_environment_variable = client.V1EnvVar(
