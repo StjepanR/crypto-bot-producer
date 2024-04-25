@@ -21,7 +21,7 @@ class Producer:
             sasl_plain_username="user1",
             sasl_plain_password="",
             security_protocol="SASL_PLAINTEXT",
-            sasl_mechanism="SASL_PLAINTEXT",
+            sasl_mechanism="PLAIN",
             api_version=(0, 10))
 
     def produce(self, topic, message):
