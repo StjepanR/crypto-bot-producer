@@ -18,6 +18,8 @@ class Producer:
         config = Config()
         self.producer = KafkaProducer(
             bootstrap_servers=[config.kafka_broker_url],
+            sasl_plain_username="user1",
+            sasl_plain_password="",
             security_protocol=security_protocol,
             ssl_context=context,
             sasl_mechanism=sasl_mechanism,
