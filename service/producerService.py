@@ -5,7 +5,7 @@ from kafka import KafkaProducer
 from config.config import Config
 
 sasl_mechanism = 'PLAIN'
-security_protocol = 'SASL_SSL'
+security_protocol = 'SASL_PLAINTEXT'
 
 # Create a new context using system defaults, disable all but TLS1.2
 context = ssl.create_default_context()
@@ -20,9 +20,8 @@ class Producer:
             bootstrap_servers=[config.kafka_broker_url],
             sasl_plain_username="user1",
             sasl_plain_password="",
-            security_protocol=security_protocol,
-            ssl_context=context,
-            sasl_mechanism=sasl_mechanism,
+            security_protocol="SASL_PLAINTEXT",
+            sasl_mechanism="SASL_PLAINTEXT",
             api_version=(0, 10))
 
     def produce(self, topic, message):
