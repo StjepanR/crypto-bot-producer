@@ -41,7 +41,7 @@ async def subscribe(channel):
 
     deployment_name = channel.lower() + "-worker"
 
-    if "ticker" in socket.ws_client.subscriptions.keys() and deployment_name not in socket.ws_client.subscriptions["ticker"]:
+    if "ticker" not in socket.ws_client.subscriptions.keys() or deployment_name not in socket.ws_client.subscriptions["ticker"]:
         deployment = kubernetesService.create_deployment_object(channel.lower(), IMAGE + ":" + VERSION, PORT,
                                                                 deployment_name, channel)
         kubernetesService.create_deployment(deployment, deployment_name)

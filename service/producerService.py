@@ -1,13 +1,27 @@
 import logging
+import ssl
 
 from kafka import KafkaProducer
 from config.config import Config
+
+sasl_mechanism = 'PLAIN'
+security_protocol = 'SASL_SSL'
+
+# Create a new context using system defaults, disable all but TLS1.2
+context = ssl.create_default_context()
+context.options &= ssl.OP_NO_TLSv1
+context.options &= ssl.OP_NO_TLSv1_1
 
 
 class Producer:
     def __init__(self):
         config = Config()
-        self.producer = KafkaProducer(bootstrap_servers=[config.kafka_broker_url])
+        self.producer = KafkaProducer(
+            bootstrap_servers=[config.kafka_broker_url],
+            security_protocol=security_protocol,
+            ssl_context=context,
+            sasl_mechanism=sasl_mechanism,
+            api_version=(0, 10))
 
     def produce(self, topic, message):
         (self.producer
