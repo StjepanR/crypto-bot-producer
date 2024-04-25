@@ -8,6 +8,10 @@ from service.producerService import Producer
 class CoinbaseSocket:
 
     def __init__(self, api_key, api_secret, verbose=True):
+        logging.log("api_key: " + api_key)
+        logging.log("api_secret: " + api_secret)
+        print(api_secret)
+        print(api_key)
         self.ws_client = WSClient(api_key=api_key, api_secret=api_secret, on_message=on_message, verbose=verbose)
         self.producer = Producer()
 
@@ -32,7 +36,6 @@ class CoinbaseSocket:
         except Exception as e:
             logging.error("failed to unsubscribe from channel: " + channel, e)
             raise RuntimeError("failed to unsubscribe from channel: " + channel)
-
 
     def close(self):
         try:
