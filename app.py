@@ -8,6 +8,8 @@ from fastapi import FastAPI
 
 config = Config()
 
+logging.basicConfig()
+
 app = FastAPI()
 Instrumentator().instrument(app).expose(app)
 
@@ -51,7 +53,7 @@ async def subscribe(channel):
     return {"message": "subscribed to channel: " + channel}
 
 
-@app.delete("/stream/unsubscribe/{channel}")
+@app.get("/stream/unsubscribe/{channel}")
 async def unsubscribe(channel):
     logging.info("unsubscribing from channel: " + channel)
 
