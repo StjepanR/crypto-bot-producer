@@ -16,13 +16,7 @@ context.options &= ssl.OP_NO_TLSv1_1
 class Producer:
     def __init__(self):
         config = Config()
-        self.producer = KafkaProducer(
-            bootstrap_servers=[config.kafka_broker_url],
-            sasl_plain_username="user1",
-            sasl_plain_password="",
-            security_protocol="SASL_PLAINTEXT",
-            sasl_mechanism="PLAIN",
-            api_version=(0, 10))
+        self.producer = KafkaProducer(bootstrap_servers=[config.kafka_broker_url])
 
     def produce(self, topic, message):
         (self.producer
