@@ -8,7 +8,7 @@ from fastapi import FastAPI
 
 config = Config()
 
-logging.basicConfig()
+logging.root.setLevel(logging.INFO)
 
 app = FastAPI()
 Instrumentator().instrument(app).expose(app)
