@@ -19,6 +19,7 @@ class Producer:
         self.producer = KafkaProducer(bootstrap_servers=[config.kafka_broker_url])
 
     def produce(self, topic, message):
+        logging.info("sending message to topic: " + topic)
         (self.producer
          .send(topic, message)
          .add_callback(self.on_send_success)
