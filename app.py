@@ -44,6 +44,7 @@ async def subscribe(channel):
     deployment_name = channel.lower() + "-worker"
 
     if "ticker" not in socket.ws_client.subscriptions.keys() or channel not in socket.ws_client.subscriptions["ticker"]:
+        socket.ws_client.subscribe(channel)
         deployment = kubernetesService.create_deployment_object(channel.lower(), IMAGE + ":" + VERSION, PORT,
                                                                 deployment_name, channel)
         kubernetesService.create_deployment(deployment, deployment_name)
@@ -60,6 +61,7 @@ async def unsubscribe(channel):
     deployment_name = channel.lower() + "-worker"
 
     if "ticker" in socket.ws_client.subscriptions.keys() and channel in socket.ws_client.subscriptions["ticker"]:
+        socket.ws_client.unsubscribe(channel)
         kubernetesService.delete_deployment(deployment_name)
     else:
         return {"message": "not previously subscribed to channel: " + channel}
