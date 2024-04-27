@@ -40,9 +40,10 @@ class CoinbaseSocket:
             logging.error("closing coinbase socket failed", e)
             raise RuntimeError("closing coinbase socket failed")
 
+
 def on_message(message):
     try:
-        logging.debug("got new message: " + message)
+        logging.info("got new message: " + message)
 
         message_data = json.loads(message)
 
