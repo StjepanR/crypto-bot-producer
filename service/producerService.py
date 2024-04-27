@@ -21,12 +21,14 @@ class Producer:
     def produce(self, topic, message):
         logging.info("sending message to topic: " + topic)
         (self.producer
-         .send(topic, message)
-         .add_callback(self.on_send_success)
-         .add_errback(self.on_send_error))
+         .send(topic=topic, value=message)
+         .add_callback(on_send_success)
+         .add_errback(on_send_error))
 
-    def on_send_success(self, metadata):
-        logging.info("message sent to topic: " + metadata.topic)
 
-    def on_send_error(self, e):
-        logging.error("error occurred sending message", exc_info=e)
+def on_send_success(metadata):
+    logging.info("message sent to topic: " + metadata.topic)
+
+
+def on_send_error(e):
+    logging.error("error occurred sending message", exc_info=e)
