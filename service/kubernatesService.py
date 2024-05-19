@@ -14,7 +14,7 @@ class KubernetesService:
         self.namespace = "default"
         self.config = Config()
 
-    def create_deployment_object(self, name, image, port, deployment_name, topic):
+    def create_deployment_object(self, name, image, port, deployment_name, topic, model):
         # Get metadata
         producer = self.api.list_namespaced_deployment(namespace="default",
                                                        label_selector="type=producer")  # V1DeploymentList
@@ -41,6 +41,11 @@ class KubernetesService:
             value=topic
         )
 
+        model = client.V1EnvVar(
+            name="MODEL",
+            value=model
+        )
+
         # Configure Pod template container
         container = client.V1Container(
             name=name,
@@ -54,7 +59,8 @@ class KubernetesService:
                 coinbase_api_secret_environment_variable,
                 coinbase_api_key_environment_variable,
                 kafka_broker_url_environment_variable,
-                kafka_topic_environment_variable
+                kafka_topic_environment_variable,
+                model
             ]
         )
 
