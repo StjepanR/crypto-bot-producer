@@ -6,3 +6,5 @@ class Config:
         self.kafka_broker_url = "crypto-bot-kafka.default.svc.cluster.local:9092"
         self.coinbase_api_key = os.getenv("COINBASE_API_KEY")
         self.coinbase_api_secret = os.getenv("COINBASE_API_SECRET")
+        self.binance_api_key = os.getenv("BINANCE_API_KEY")
+        self.binance_api_secret = os.getenv("BINANCE_API_SECRET")

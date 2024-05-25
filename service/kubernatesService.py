@@ -21,14 +21,14 @@ class KubernetesService:
         print(producer._metadata)
 
         # Create environment variables for container
-        coinbase_api_secret_environment_variable = client.V1EnvVar(
-            name="COINBASE_API_SECRET",
-            value=self.config.coinbase_api_secret
+        binance_api_secret_environment_variable = client.V1EnvVar(
+            name="BINANCE_API_SECRET",
+            value=self.config.binance_api_secret
         )
 
-        coinbase_api_key_environment_variable = client.V1EnvVar(
-            name="COINBASE_API_KEY",
-            value=self.config.coinbase_api_key
+        binance_api_key_environment_variable = client.V1EnvVar(
+            name="BINANCE_API_KEY",
+            value=self.config.binance_api_key
         )
 
         kafka_broker_url_environment_variable = client.V1EnvVar(
@@ -56,8 +56,8 @@ class KubernetesService:
                 limits={"cpu": "500m", "memory": "500Mi"},
             ),
             env=[
-                coinbase_api_secret_environment_variable,
-                coinbase_api_key_environment_variable,
+                binance_api_secret_environment_variable,
+                binance_api_key_environment_variable,
                 kafka_broker_url_environment_variable,
                 kafka_topic_environment_variable,
                 model
