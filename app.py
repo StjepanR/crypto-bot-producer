@@ -19,7 +19,7 @@ kubernetesService = KubernetesService()
 IMAGE = "stjepanruklic/crypto-bot-worker"
 VERSION = "latest"
 PORT = 5001
-AVAILABLE_MODELS = {"lstm", "cnn", "dense", "gru"}
+AVAILABLE_MODELS = {"lstm", "conv", "dense", "gru", "arima", "prophet", "sarima"}
 
 socket = CoinbaseSocket(api_key=config.coinbase_api_key, api_secret=config.coinbase_api_secret)
 socket.start()
