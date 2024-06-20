@@ -93,6 +93,7 @@ class KubernetesService:
         return deployment
 
     def create_deployment(self, deployment, deployment_name):
+        logging.info("creating deployment :" + str(deployment_name))
         try:
             response = self.api.create_namespaced_deployment(
                 body=deployment, namespace=self.namespace
@@ -117,6 +118,7 @@ class KubernetesService:
             raise RuntimeError("failed to update deployment: " + deployment_name)
 
     def restart_deployment(self, deployment, deployment_name):
+        logging.info("restarting deployment :" + str(deployment_name))
         try:
             deployment.spec.template.metadata.annotations = {
                 "kubectl.kubernetes.io/restartedAt": datetime.datetime.now(tz=pytz.UTC)
@@ -134,6 +136,7 @@ class KubernetesService:
             raise RuntimeError("failed to restart deployment: " + deployment_name)
 
     def delete_deployment(self, deployment_name):
+        logging.info("deleting deployment :" + str(deployment_name))
         try:
             response = self.api.delete_namespaced_deployment(
                 name=deployment_name,
