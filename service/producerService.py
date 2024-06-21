@@ -13,6 +13,7 @@ class Producer:
                                       value_serializer=lambda v: json.dumps(v).encode('utf-8'))
 
     def produce(self, topic, message):
+        topic = topic.lower()
         logging.info("sending message to topic: " + topic)
         (self.producer
          .send(topic=topic, value=message)
