@@ -4,6 +4,7 @@ import logging
 from coinbase.websocket import WSClient, WSClientConnectionClosedException, WSClientException
 from service.producerService import Producer
 
+SUBSCRIPTION_CHANNEL = "level2"
 
 class CoinbaseSocket:
 
@@ -23,7 +24,7 @@ class CoinbaseSocket:
     def subscribe(self, channel):
         logging.info("subscribing to channel: " + channel)
         try:
-            self.ws_client.subscribe(product_ids=[channel], channels=["ticker"])
+            self.ws_client.subscribe(product_ids=[channel], channels=[SUBSCRIPTION_CHANNEL])
         except Exception as e:
             logging.error("failed to subscribe to channel: " + channel, e)
             raise RuntimeError("failed to subscribe to channel: " + channel)
@@ -31,7 +32,7 @@ class CoinbaseSocket:
     def unsubscribe(self, channel):
         logging.info("unsubscribing from channel: " + channel)
         try:
-            self.ws_client.unsubscribe(product_ids=[channel], channels=["ticker"])
+            self.ws_client.unsubscribe(product_ids=[channel], channels=[SUBSCRIPTION_CHANNEL])
         except Exception as e:
             logging.error("failed to unsubscribe from channel: " + channel, e)
             raise RuntimeError("failed to unsubscribe from channel: " + channel)
@@ -51,7 +52,7 @@ class CoinbaseSocket:
 
             message_data = json.loads(message)
 
-            if "channel" in message_data and message_data["channel"] == "ticker":
+            if "channel" in message_data and message_data["channel"] == SUBSCRIPTION_CHANNEL:
                 price_data = get_product_data(message_data)
                 self.producer.produce(price_data["product_id"], price_data)
 
