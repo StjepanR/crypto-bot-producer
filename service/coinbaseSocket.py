@@ -12,6 +12,7 @@ class CoinbaseSocket:
         self.producer = Producer()
 
     def start(self):
+        logging.info("opening connection to socket")
         try:
             self.ws_client.open()
         except WSClientConnectionClosedException as e:
@@ -20,6 +21,7 @@ class CoinbaseSocket:
             print("Error encountered!", e)
 
     def subscribe(self, channel):
+        logging.info("subscribing to channel: " + channel)
         try:
             self.ws_client.subscribe(product_ids=[channel], channels=["ticker"])
         except Exception as e:
@@ -27,6 +29,7 @@ class CoinbaseSocket:
             raise RuntimeError("failed to subscribe to channel: " + channel)
 
     def unsubscribe(self, channel):
+        logging.info("unsubscribing from channel: " + channel)
         try:
             self.ws_client.unsubscribe(product_ids=[channel], channels=["ticker"])
         except Exception as e:
@@ -34,6 +37,7 @@ class CoinbaseSocket:
             raise RuntimeError("failed to unsubscribe from channel: " + channel)
 
     def close(self):
+        logging.info("closing connection to socket")
         try:
             self.ws_client.close()
         except Exception as e:
