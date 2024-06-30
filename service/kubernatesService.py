@@ -61,10 +61,6 @@ class KubernetesService:
             name=name,
             image=image,
             ports=[client.V1ContainerPort(container_port=port)],
-            resources=client.V1ResourceRequirements(
-                requests={"cpu": "100m", "memory": "500Mi"},
-                limits={"cpu": "500m", "memory": "900Mi"},
-            ),
             env=[
                 binance_api_secret_environment_variable,
                 binance_api_key_environment_variable,
