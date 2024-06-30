@@ -14,7 +14,7 @@ class KubernetesService:
         self.namespace = "default"
         self.config = Config()
 
-    def create_deployment_object(self, name, image, port, deployment_name, topic, model):
+    def create_deployment_object(self, name, image, port, deployment_name, topic, model, frequency, steps):
         # Get metadata
         producer = self.api.list_namespaced_deployment(namespace="default",
                                                        label_selector="type=producer")  # V1DeploymentList
@@ -41,9 +41,19 @@ class KubernetesService:
             value=topic
         )
 
-        model = client.V1EnvVar(
+        model_environment_variable = client.V1EnvVar(
             name="MODEL",
             value=model
+        )
+
+        frequency_environment_variable = client.V1EnvVar(
+            name="FREQUENCY",
+            value=frequency
+        )
+
+        steps_environment_variable = client.V1EnvVar(
+            name="STEPS",
+            value=steps
         )
 
         # Configure Pod template container
@@ -60,7 +70,9 @@ class KubernetesService:
                 binance_api_key_environment_variable,
                 kafka_broker_url_environment_variable,
                 kafka_topic_environment_variable,
-                model
+                model_environment_variable,
+                frequency_environment_variable,
+                steps_environment_variable
             ]
         )
 

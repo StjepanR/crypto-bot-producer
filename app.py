@@ -20,6 +20,7 @@ IMAGE = "stjepanruklic/crypto-bot-worker"
 VERSION = "latest"
 PORT = 5001
 AVAILABLE_MODELS = {"lstm", "conv", "dense", "gru", "arima", "prophet", "sarima"}
+AVAILABLE_FREQUENCIES = {"1m", "1h", "1d"}
 
 socket = CoinbaseSocket(api_key=config.coinbase_api_key, api_secret=config.coinbase_api_secret)
 socket.start()
@@ -51,16 +52,31 @@ async def list_streams():
 
 
 @app.get("/stream/subscribe/{channel}")
-async def subscribe(channel, model):
-    channel = channel.lower()
-    model = model.lower()
+async def subscribe(channel, model, frequency="1h", steps="24"):
+    # add  epochs, batch_size, window_size, horizon
+    frequency = str(frequency).lower()
+    steps = str(steps)
+    channel = str(channel).lower()
+    model = str(model).lower()
     configuration = channel + "-" + model
     logging.info("subscribing to configuration: " + configuration)
+
+    if frequency in AVAILABLE_FREQUENCIES:
+        logging.info("selected frequency is: " + frequency)
+    else:
+        logging.info("frequency value is not supported")
+        return {"message": "frequency: " + frequency + " is not supported"}
+
+    if steps.isdigit():
+        logging.info("selected steps value is: " + steps)
+    else:
+        logging.info("steps value is not supported")
+        return {"message": "steps: " + steps + " is not supported"}
 
     if model in AVAILABLE_MODELS:
         logging.info("selected model is: " + model)
     elif model is None:
-        logging.info("model is not specified")
+        logging.info("model value is not specified")
         return {"message": "model is not specified"}
     else:
         logging.info("model is not supported")
@@ -76,7 +92,7 @@ async def subscribe(channel, model):
 
     deployment_name = configuration + "-worker"
     deployment = kubernetesService.create_deployment_object(channel, IMAGE + ":" + VERSION, PORT,
-                                                            deployment_name, channel, model)
+                                                            deployment_name, channel, model, frequency, steps)
     kubernetesService.create_deployment(deployment, deployment_name)
 
     return {"message": "configuration: " + channel + "-" + model + " created"}
@@ -84,8 +100,8 @@ async def subscribe(channel, model):
 
 @app.get("/stream/unsubscribe/{channel}")
 async def unsubscribe(channel, model):
-    channel = channel.lower()
-    model = model.lower()
+    channel = str(channel).lower()
+    model = str(model).lower()
     configuration = channel + "-" + model
     logging.info("unsubscribing from configuration: " + configuration)
 
