@@ -1,4 +1,4 @@
-FROM python:3.9.18-slim-bullseye
+FROM stjepanruklic/crypto-bot-producer-base:1.0.0
 ADD . /app
 WORKDIR /app
 RUN pip install -r requirements.txt

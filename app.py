@@ -19,7 +19,7 @@ kubernetesService = KubernetesService()
 IMAGE = "stjepanruklic/crypto-bot-worker"
 VERSION = "latest"
 PORT = 5001
-AVAILABLE_MODELS = {"lstm", "conv", "dense", "gru", "arima", "prophet", "sarima"}
+AVAILABLE_MODELS = {"lstm", "conv", "dense", "gru", "arima", "prophet", "sarima", "naive"}
 AVAILABLE_FREQUENCIES = {"1m", "1h", "1d"}
 
 socket = CoinbaseSocket(api_key=config.coinbase_api_key, api_secret=config.coinbase_api_secret)
@@ -41,6 +41,7 @@ async def list_streams():
     except Exception as e:
         logging.error("failed to fetch list of subscriptions", e)
 
+
 @app.get("/configurations/list")
 async def list_streams():
     try:
@@ -50,12 +51,13 @@ async def list_streams():
         logging.error("failed to fetch list of subscriptions", e)
 
 
-
-@app.get("/stream/subscribe/{channel}")
-async def subscribe(channel, model, frequency="1h", steps="24"):
-    # add  epochs, batch_size, window_size, horizon
+@app.get("/stream/subscribe")
+async def subscribe(channel, model, epochs="100", window_size="24", batch_size="32", frequency="1h", steps="24"):
     frequency = str(frequency).lower()
     steps = str(steps)
+    epochs = str(epochs)
+    window_size = str(window_size)
+    batch_size = str(batch_size)
     channel = str(channel).lower()
     model = str(model).lower()
     configuration = channel + "-" + model
@@ -65,22 +67,45 @@ async def subscribe(channel, model, frequency="1h", steps="24"):
         logging.info("selected frequency is: " + frequency)
     else:
         logging.info("frequency value is not supported")
-        return {"message": "frequency: " + frequency + " is not supported"}
+        return {"message": "frequency: " + frequency + " is not supported",
+                "hint": "values 1m, 1h and 1d are supported"}
 
-    if steps.isdigit():
+    if steps.isdigit() and 0 < int(epochs) < 100:
         logging.info("selected steps value is: " + steps)
     else:
         logging.info("steps value is not supported")
-        return {"message": "steps: " + steps + " is not supported"}
+        return {"message": "steps: " + steps + " is not supported", "hint": "specify positive integer less than 100"}
+
+    if epochs.isdigit():
+        logging.info("selected epochs value is: " + epochs)
+    else:
+        logging.info("epochs value is not supported")
+        return {"message": "epochs: " + epochs + " is not supported",
+                "hint": "specify positive integer"}
+
+    if window_size.isdigit():
+        logging.info("selected window size value is: " + window_size)
+    else:
+        logging.info("window size value is not supported")
+        return {"message": "window size: " + window_size + " is not supported",
+                "hint": "specify positive integer less than 100"}
+
+    if batch_size.isdigit() and 0 < int(window_size) < 1000:
+        logging.info("selected batch size value is: " + batch_size)
+    else:
+        logging.info("batch size value is not supported")
+        return {"message": "batch size: " + batch_size + " is not supported", "hint": "specify positive integer"}
 
     if model in AVAILABLE_MODELS:
         logging.info("selected model is: " + model)
     elif model is None:
         logging.info("model value is not specified")
-        return {"message": "model is not specified"}
+        return {"message": "model is not specified",
+                "hint": "supported models are: \"lstm\", \"conv\", \"dense\", \"gru\", \"arima\", \"prophet\", \"sarima\", \"naive\""}
     else:
         logging.info("model is not supported")
-        return {"message": "model: " + model + " is not supported"}
+        return {"message": "model: " + model + " is not supported",
+                "hint": "supported models are: \"lstm\", \"conv\", \"dense\", \"gru\", \"arima\", \"prophet\", \"sarima\", \"naive\""}
 
     if model in configurations[channel]:
         return {"message": "same configuration: " + channel + "-" + model + " is already being used"}
@@ -92,13 +117,14 @@ async def subscribe(channel, model, frequency="1h", steps="24"):
 
     deployment_name = configuration + "-worker"
     deployment = kubernetesService.create_deployment_object(channel, IMAGE + ":" + VERSION, PORT,
-                                                            deployment_name, channel, model, frequency, steps)
+                                                            deployment_name, channel, model, frequency, steps, epochs,
+                                                            window_size, batch_size)
     kubernetesService.create_deployment(deployment, deployment_name)
 
     return {"message": "configuration: " + channel + "-" + model + " created"}
 
 
-@app.get("/stream/unsubscribe/{channel}")
+@app.get("/stream/unsubscribe")
 async def unsubscribe(channel, model):
     channel = str(channel).lower()
     model = str(model).lower()

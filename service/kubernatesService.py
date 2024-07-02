@@ -14,7 +14,7 @@ class KubernetesService:
         self.namespace = "default"
         self.config = Config()
 
-    def create_deployment_object(self, name, image, port, deployment_name, topic, model, frequency, steps):
+    def create_deployment_object(self, name, image, port, deployment_name, topic, model, frequency, steps, epochs, window_size, batch_size):
         # Get metadata
         producer = self.api.list_namespaced_deployment(namespace="default",
                                                        label_selector="type=producer")  # V1DeploymentList
@@ -56,6 +56,21 @@ class KubernetesService:
             value=steps
         )
 
+        epochs_environment_variable = client.V1EnvVar(
+            name="EPOCHS",
+            value=epochs
+        )
+
+        window_size_environment_variable = client.V1EnvVar(
+            name="WINDOW_SIZE",
+            value=window_size
+        )
+
+        batch_size_environment_variable = client.V1EnvVar(
+            name="BATCH_SIZE",
+            value=batch_size
+        )
+
         # Configure Pod template container
         container = client.V1Container(
             name=name,
@@ -68,7 +83,10 @@ class KubernetesService:
                 kafka_topic_environment_variable,
                 model_environment_variable,
                 frequency_environment_variable,
-                steps_environment_variable
+                steps_environment_variable,
+                epochs_environment_variable,
+                window_size_environment_variable,
+                batch_size_environment_variable
             ]
         )
 
