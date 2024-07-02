@@ -70,7 +70,7 @@ async def subscribe(channel, model, epochs="100", window_size="24", batch_size="
         return {"message": "frequency: " + frequency + " is not supported",
                 "hint": "values 1m, 1h and 1d are supported"}
 
-    if steps.isdigit() and 0 < int(epochs) < 100:
+    if steps.isdigit() and 0 < int(steps) < 100:
         logging.info("selected steps value is: " + steps)
     else:
         logging.info("steps value is not supported")
