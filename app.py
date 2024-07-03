@@ -126,7 +126,7 @@ async def subscribe(channel, model, epochs="100", window_size="24", batch_size="
     deployment_name = configuration + "-worker"
     deployment = kubernetesService.create_deployment_object(channel, IMAGE + ":" + VERSION, PORT,
                                                             deployment_name, channel, model, frequency, steps, epochs,
-                                                            window_size, batch_size)
+                                                            window_size, batch_size, scaler)
     kubernetesService.create_deployment(deployment, deployment_name)
 
     return {"message": "configuration: " + channel + "-" + model + " created"}
