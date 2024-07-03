@@ -21,7 +21,7 @@ VERSION = "latest"
 PORT = 5001
 AVAILABLE_MODELS = {"lstm", "conv", "dense", "gru", "arima", "prophet", "sarima", "naive"}
 AVAILABLE_FREQUENCIES = {"1m", "1h", "1d"}
-AVAILABLE_SCALERS = {"standard", "minmax", "none"}
+AVAILABLE_SCALERS = {"standard", "minmax", "maxabs", "none"}
 
 socket = CoinbaseSocket(api_key=config.coinbase_api_key, api_secret=config.coinbase_api_secret)
 socket.start()
