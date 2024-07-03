@@ -21,7 +21,7 @@ VERSION = "latest"
 PORT = 5001
 AVAILABLE_MODELS = {"lstm", "conv", "dense", "gru", "arima", "prophet", "sarima", "naive"}
 AVAILABLE_FREQUENCIES = {"1m", "1h", "1d"}
-AVAILABLE_SCALERS = {"standard", "minmax", "maxabs", "none"}
+AVAILABLE_SCALERS = {"standard", "minmax", "maxabs", "robust", "none"}
 
 socket = CoinbaseSocket(api_key=config.coinbase_api_key, api_secret=config.coinbase_api_secret)
 socket.start()
@@ -102,7 +102,7 @@ async def subscribe(channel, model, epochs="100", window_size="24", batch_size="
         logging.info("selected scaler is: " + scaler)
     else:
         logging.info("scaler is not supported")
-        return {"message": "scaler: " + scaler + " is not supported", "hint": "supported scalers are: \"standard\", \"minmax\", \"none\""}
+        return {"message": "scaler: " + scaler + " is not supported", "hint": "supported scalers are: \"standard\", \"minmax\", \"maxabs\", \"robust\", \"none\""}
 
     if model in AVAILABLE_MODELS:
         logging.info("selected model is: " + model)
