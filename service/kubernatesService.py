@@ -14,7 +14,7 @@ class KubernetesService:
         self.namespace = "default"
         self.config = Config()
 
-    def create_deployment_object(self, name, image, port, deployment_name, topic, model, frequency, steps, epochs, window_size, batch_size):
+    def create_deployment_object(self, name, image, port, deployment_name, topic, model, frequency, steps, epochs, window_size, batch_size, scaler):
         # Get metadata
         producer = self.api.list_namespaced_deployment(namespace="default",
                                                        label_selector="type=producer")  # V1DeploymentList
@@ -71,6 +71,11 @@ class KubernetesService:
             value=batch_size
         )
 
+        scaler_environment_variable = client.V1EnvVar(
+            name="SCALER",
+            value=scaler
+        )
+
         # Configure Pod template container
         container = client.V1Container(
             name=name,
@@ -86,7 +91,8 @@ class KubernetesService:
                 steps_environment_variable,
                 epochs_environment_variable,
                 window_size_environment_variable,
-                batch_size_environment_variable
+                batch_size_environment_variable,
+                scaler_environment_variable
             ]
         )
 

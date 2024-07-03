@@ -21,6 +21,7 @@ VERSION = "latest"
 PORT = 5001
 AVAILABLE_MODELS = {"lstm", "conv", "dense", "gru", "arima", "prophet", "sarima", "naive"}
 AVAILABLE_FREQUENCIES = {"1m", "1h", "1d"}
+AVAILABLE_SCALERS = {"standard", "minmax", "none"}
 
 socket = CoinbaseSocket(api_key=config.coinbase_api_key, api_secret=config.coinbase_api_secret)
 socket.start()
@@ -52,14 +53,15 @@ async def list_streams():
 
 
 @app.get("/stream/subscribe")
-async def subscribe(channel, model, epochs="100", window_size="24", batch_size="32", frequency="1h", steps="24"):
-    frequency = str(frequency).lower()
-    steps = str(steps)
+async def subscribe(channel, model, epochs="100", window_size="24", batch_size="32", frequency="1h", steps="24", scaler="none"):
+    channel = str(channel).lower()
+    model = str(model).lower()
     epochs = str(epochs)
     window_size = str(window_size)
     batch_size = str(batch_size)
-    channel = str(channel).lower()
-    model = str(model).lower()
+    frequency = str(frequency).lower()
+    steps = str(steps)
+    scaler = str(scaler).lower()
     configuration = channel + "-" + model
     logging.info("subscribing to configuration: " + configuration)
 
@@ -95,6 +97,12 @@ async def subscribe(channel, model, epochs="100", window_size="24", batch_size="
     else:
         logging.info("batch size value is not supported")
         return {"message": "batch size: " + batch_size + " is not supported", "hint": "specify positive integer"}
+
+    if scaler in AVAILABLE_SCALERS:
+        logging.info("selected scaler is: " + scaler)
+    else:
+        logging.info("scaler is not supported")
+        return {"message": "scaler: " + scaler + " is not supported", "hint": "supported scalers are: \"standard\", \"minmax\", \"none\""}
 
     if model in AVAILABLE_MODELS:
         logging.info("selected model is: " + model)
