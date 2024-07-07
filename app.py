@@ -17,7 +17,7 @@ Instrumentator().instrument(app).expose(app)
 kubernetesService = KubernetesService()
 
 IMAGE = "stjepanruklic/crypto-bot-worker"
-VERSION = "latest"
+VERSION = "1.0.108"
 PORT = 5001
 AVAILABLE_MODELS = {"lstm", "conv", "dense", "gru", "arima", "prophet", "sarima", "naive"}
 AVAILABLE_FREQUENCIES = {"1m", "1h", "1d"}
